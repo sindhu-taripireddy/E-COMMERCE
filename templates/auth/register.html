@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<div style="max-width:480px; margin:60px auto 90px; padding:0 24px;">
+  
+  <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:36px 32px; box-shadow:var(--shadow-md);">
+    
+    <div style="text-align:center; margin-bottom:28px;">
+      <div class="logo-monogram" style="margin:0 auto 12px; width:48px; height:48px; font-size:1.4rem;">KK</div>
+      <h1 style="font-size:1.8rem; color:var(--burgundy-dark); margin:0;">Create Account</h1>
+      <p style="color:var(--gray-muted); font-size:0.85rem; margin-top:4px;">
+        Join our inner circle for exclusive bridal drops & styling updates.
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('register') }}">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" name="name" class="form-control" placeholder="Priya Sharma" required>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" name="email" class="form-control" placeholder="priya@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label>Mobile Number (For WhatsApp Updates)</label>
+        <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210">
+      </div>
+
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:8px; padding:12px;">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:24px; font-size:0.85rem; border-top:1px solid var(--border-color); padding-top:18px;">
+      Already have an account? <br>
+      <a href="{{ url_for('login') }}" style="color:var(--burgundy); font-weight:700;">Sign in to your account</a>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Order Processing — KK_COLLECTIONS Admin{% endblock %}
+{% block page_title %}Customer Orders & Fulfillment{% endblock %}
+
+{% block content %}
+
+<div class="admin-card-table">
+  
+  <div class="table-header-row">
+    <div>
+      <h3>Orders Management ({{ orders|length }} Orders)</h3>
+      <span style="font-size:0.8rem; color:var(--admin-text-muted);">Manage order statuses and view real-time delivery timelines</span>
+    </div>
+
+    <!-- Filter by Status -->
+    <div style="display:flex; gap:8px; align-items:center;">
+      <span style="font-size:0.82rem; font-weight:600;">Status:</span>
+      <select class="form-control" style="width:auto; font-size:0.82rem; padding:6px 12px;"
+              onchange="location.href = '{{ url_for('admin_orders') }}?status=' + this.value;">
+        {% for st in ["All", "Pending", "Confirmed", "Packed", "Shipped", "Out for Delivery", "Delivered", "Cancelled"] %}
+          <option value="{{ st }}" {% if current_status == st %}selected{% endif %}>{{ st }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Tracking #</th>
+        <th>Customer</th>
+        <th>Items Ordered</th>
+        <th>Total Amount</th>
+        <th>Payment</th>
+        <th>Order Status</th>
+        <th>Update Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+        <tr>
+          <td>
+            <strong style="color:var(--admin-burgundy);">#{{ order.tracking_number }}</strong>
+            <div style="font-size:0.75rem; color:var(--admin-text-muted);">{{ order.created_at[:10] }}</div>
+          </td>
+
+          <td>
+            <div style="font-weight:600;">{{ order.customer_name }}</div>
+            <div style="font-size:0.75rem; color:var(--admin-text-muted);">{{ order.city }}, {{ order.state }}</div>
+            <div style="font-size:0.75rem; color:var(--admin-text-muted);">{{ order.phone }}</div>
+          </td>
+
+          <td>
+            <div style="display:flex; flex-direction:column; gap:4px; max-width:260px;">
+              {% for item in order['items'] %}
+                <div style="font-size:0.82rem;">
+                  • {{ item.product_name }} 
+                  <span style="color:var(--admin-text-muted);">(Qty: {{ item.quantity }})</span>
+                </div>
+              {% endfor %}
+            </div>
+          </td>
+
+          <td style="font-weight:700; font-size:0.95rem;">
+            ₹{{ order.total_amount }}
+          </td>
+
+          <td>
+            <span style="font-size:0.8rem; font-weight:600; color:#198754;">
+              {{ order.payment_method }} ({{ order.payment_status }})
+            </span>
+          </td>
+
+          <td>
+            <span class="status-pill status-{{ order.order_status|lower|replace(' ', '-') }}">
+              {{ order.order_status }}
+            </span>
+          </td>
+
+          <td>
+            <form method="POST" action="{{ url_for('admin_order_status_update', order_id=order.order_id) }}" style="display:flex; gap:6px; align-items:center;">
+              <select name="order_status" class="form-control" style="font-size:0.78rem; padding:4px 8px; width:130px;">
+                {% for s in ["Pending", "Confirmed", "Packed", "Shipped", "Out for Delivery", "Delivered", "Cancelled"] %}
+                  <option value="{{ s }}" {% if order.order_status == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-primary" style="padding:4px 10px; font-size:0.78rem;" title="Save Status">
+                <i class="fas fa-check"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+{% endblock %}

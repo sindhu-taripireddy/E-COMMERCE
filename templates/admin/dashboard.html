@@ -1,0 +1,208 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Dashboard Overview — KK_COLLECTIONS Seller Portal{% endblock %}
+{% block page_title %}Store Performance Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- KPI Metrics Cards Row -->
+<div class="metrics-row">
+  
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Total Sales</span>
+      <div class="stat-value">₹{{ metrics.total_sales }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-sales">
+      <i class="fas fa-rupee-sign"></i>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Total Orders</span>
+      <div class="stat-value">{{ metrics.total_orders }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-orders">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Active Products</span>
+      <div class="stat-value">{{ metrics.total_products }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-products">
+      <i class="fas fa-gem"></i>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Registered Customers</span>
+      <div class="stat-value">{{ metrics.total_customers }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-customers">
+      <i class="fas fa-user-friends"></i>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Low Stock Alerts</span>
+      <div class="stat-value" style="color:{% if metrics.low_stock_count > 0 %}#DC3545{% else %}#198754{% endif %};">
+        {{ metrics.low_stock_count }}
+      </div>
+    </div>
+    <div class="stat-icon-wrap icon-stock">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+  </div>
+
+</div>
+
+<!-- Interactive Charts Grid -->
+<div class="charts-grid">
+  
+  <div class="chart-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3>Revenue & Orders Velocity</h3>
+      <span style="font-size:0.8rem; color:var(--admin-text-muted);">Current Business Cycle</span>
+    </div>
+    <canvas id="salesChart" height="130"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3>Category Revenue Share</h3>
+      <span style="font-size:0.8rem; color:var(--admin-text-muted);">By Volume</span>
+    </div>
+    <canvas id="categoryChart" height="130"></canvas>
+  </div>
+
+</div>
+
+<!-- Recent Orders & Top Products Row -->
+<div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px;">
+  
+  <!-- Recent Orders Table -->
+  <div class="admin-card-table">
+    <div class="table-header-row">
+      <h3>Recent Customer Orders</h3>
+      <a href="{{ url_for('admin_orders') }}" style="font-size:0.82rem; color:var(--admin-burgundy); font-weight:600;">View All &rarr;</a>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Tracking ID</th>
+          <th>Customer</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in metrics.recent_orders %}
+          <tr>
+            <td style="font-weight:700; color:var(--admin-burgundy);">#{{ order.tracking_number }}</td>
+            <td>
+              <div>{{ order.customer_name }}</div>
+              <span style="font-size:0.75rem; color:var(--admin-text-muted);">{{ order.city }}</span>
+            </td>
+            <td style="font-weight:700;">₹{{ order.total_amount }}</td>
+            <td>
+              <span class="status-pill status-{{ order.order_status|lower|replace(' ', '-') }}">
+                {{ order.order_status }}
+              </span>
+            </td>
+            <td>
+              <a href="{{ url_for('track_order_direct', tracking_number=order.tracking_number) }}" target="_blank" style="color:var(--admin-burgundy); font-size:0.82rem; font-weight:600;">
+                Track &rarr;
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top Selling Products -->
+  <div class="admin-card-table">
+    <div class="table-header-row">
+      <h3>Best Selling Accessories</h3>
+      <a href="{{ url_for('admin_products') }}" style="font-size:0.82rem; color:var(--admin-burgundy); font-weight:600;">Manage &rarr;</a>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      {% for prod in metrics.top_products %}
+        <div style="display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--admin-border); padding-bottom:12px;">
+          <img src="{{ url_for('static', filename='images/products/' + prod.image) }}" alt="" 
+               style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--admin-border);">
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:0.88rem; color:var(--admin-text-dark);">{{ prod.product_name }}</div>
+            <span style="font-size:0.75rem; color:var(--admin-text-muted);">Sold: {{ prod.sold_count }} units</span>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700; font-size:0.92rem; color:var(--admin-burgundy);">₹{{ prod.revenue }}</div>
+            <span style="font-size:0.75rem; color:#198754; font-weight:600;">In Stock</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Initialize Chart.js for Sales Velocity
+  const ctxSales = document.getElementById('salesChart').getContext('2d');
+  new Chart(ctxSales, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: [1250, 1890, 2450, 3120, 2800, 4600, 5200],
+        borderColor: '#5B1426',
+        backgroundColor: 'rgba(91, 20, 38, 0.08)',
+        fill: true,
+        tension: 0.35,
+        borderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#F0F0F0' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Category Distribution Doughnut
+  const ctxCat = document.getElementById('categoryChart').getContext('2d');
+  const catNames = {{ metrics.category_sales|map(attribute='name')|list|tojson }};
+  const catRevenues = {{ metrics.category_sales|map(attribute='total_revenue')|list|tojson }};
+  new Chart(ctxCat, {
+    type: 'doughnut',
+    data: {
+      labels: catNames.length ? catNames : ['Bangles', 'Earrings', 'Chains', 'Collections'],
+      datasets: [{
+        data: catRevenues.some(r => r > 0) ? catRevenues : [45, 25, 15, 15],
+        backgroundColor: ['#5B1426', '#C5A059', '#7E1E36', '#E0C27B'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+{% endblock %}

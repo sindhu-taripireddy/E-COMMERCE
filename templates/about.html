@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Our Story — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+<div style="background:linear-gradient(rgba(31,11,18,0.85), rgba(15,6,9,0.92)), url('/static/images/products/combo_bridal_set.jpg') center/cover; padding:70px 24px; text-align:center; color:#FFF; border-bottom:1px solid var(--gold);">
+  <span style="color:var(--gold-light); font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; font-weight:700;">
+    Artisanship & Heritage
+  </span>
+  <h1 style="font-size:2.8rem; color:#FFF; margin:10px 0 16px;">The KK_COLLECTIONS Story</h1>
+  <p style="color:var(--beige); max-width:650px; margin:0 auto; font-size:1.05rem; font-weight:300;">
+    Transforming traditional Indian accessories through handcrafted perfection and modern digital experiences.
+  </p>
+</div>
+
+<div style="max-width:1000px; margin:60px auto 80px; padding:0 24px; line-height:1.8;">
+  
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; margin-bottom:60px;">
+    <div>
+      <span style="color:var(--gold-dark); font-size:0.8rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:700;">From Instagram to Full E-Commerce</span>
+      <h2 style="font-size:2rem; color:var(--burgundy); margin:8px 0 16px;">Elegance That Completes You</h2>
+      <p style="color:var(--charcoal-light); margin-bottom:16px;">
+        KK_COLLECTIONS began as an artisanal Instagram boutique celebrating the rich beauty of South Indian thread work, bridal chura styling, and minimalist invisible chains.
+      </p>
+      <p style="color:var(--charcoal-light);">
+        Our mission is to make regal, heirloom-quality fashion accessories accessible with reliable sizing, transparent pricing, and instant shopping assistance powered by AI.
+      </p>
+    </div>
+
+    <div>
+      <img src="{{ url_for('static', filename='images/products/bangles_bridal_heavy.jpg') }}" alt="Artisan Craftsmanship" 
+           style="border-radius:12px; box-shadow:var(--shadow-md); border:1px solid var(--border-color);">
+    </div>
+  </div>
+
+  <div style="background:var(--cream); border:1px solid var(--border-color); border-radius:12px; padding:36px; text-align:center; margin-bottom:60px;">
+    <h3 style="font-size:1.5rem; color:var(--burgundy); margin-bottom:12px;">Visit Our Official Business Reference</h3>
+    <p style="color:var(--charcoal-light); max-width:550px; margin:0 auto 20px; font-size:0.92rem;">
+      Follow our official Instagram handle <strong>@kk_collectons</strong> to discover customer styling reels, behind-the-scenes thread wrapping, and upcoming bridal drops.
+    </p>
+    <a href="{{ instagram_url }}" target="_blank" class="btn btn-primary">
+      <i class="fab fa-instagram"></i> Follow @kk_collectons
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

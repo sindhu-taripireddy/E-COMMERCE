@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<div style="background:var(--cream); padding:30px 24px; text-align:center; border-bottom:1px solid var(--border-color);">
+  <h1 style="font-size:2rem; color:var(--burgundy-dark); margin:0;">My Order History</h1>
+  <p style="color:var(--gray-muted); font-size:0.88rem; margin-top:4px;">
+    View and track all your past and active orders with KK_COLLECTIONS.
+  </p>
+</div>
+
+<div style="max-width:1000px; margin:40px auto 70px; padding:0 24px;">
+
+  {% if orders %}
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      {% for order in orders %}
+        <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:14px; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <span style="font-size:0.75rem; color:var(--gray-muted); text-transform:uppercase;">Tracking Number</span>
+              <div style="font-size:1.15rem; font-weight:700; color:var(--burgundy);">#{{ order.tracking_number }}</div>
+              <span style="font-size:0.8rem; color:var(--gray-muted);">Placed on {{ order.created_at[:10] }}</span>
+            </div>
+
+            <div style="text-align:right;">
+              <span class="status-pill status-{{ order.order_status|lower|replace(' ', '-') }}">
+                {{ order.order_status }}
+              </span>
+              <div style="font-size:1.1rem; font-weight:700; color:var(--burgundy); margin-top:4px;">
+                ₹{{ order.total_amount }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Items list -->
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+            {% for item in order['items'] %}
+              <div style="display:flex; align-items:center; gap:14px;">
+                <img src="{{ url_for('static', filename='images/products/' + item.image) }}" alt=""
+                     style="width:55px; height:55px; object-fit:cover; border-radius:6px; border:1px solid var(--border-color);">
+                <div style="flex:1;">
+                  <div style="font-weight:600; font-size:0.92rem;">{{ item.product_name }}</div>
+                  <div style="font-size:0.8rem; color:var(--gray-muted);">
+                    Qty: {{ item.quantity }} {% if item.color %}• Color: {{ item.color }}{% endif %} {% if item.size %}• Size: {{ item.size }}{% endif %}
+                  </div>
+                </div>
+                <div style="font-weight:700; font-size:0.95rem;">₹{{ item.subtotal }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid var(--border-color); padding-top:16px;">
+            <a href="{{ url_for('track_order_direct', tracking_number=order.tracking_number) }}" class="btn btn-primary" style="padding:8px 18px; font-size:0.85rem;">
+              <i class="fas fa-map-marker-alt"></i> Live Timeline
+            </a>
+            <button class="btn btn-secondary" style="padding:8px 18px; font-size:0.85rem;" 
+                    onclick="window.openKKAssistant('Where is my order #{{ order.tracking_number }}')">
+              <i class="fas fa-robot"></i> Ask AI
+            </button>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:60px 24px; text-align:center;">
+      <i class="fas fa-box-open" style="font-size:3rem; color:var(--gold); margin-bottom:14px;"></i>
+      <h3 style="font-size:1.4rem; color:var(--burgundy-dark); margin-bottom:6px;">No Orders Yet</h3>
+      <p style="color:var(--gray-muted); font-size:0.9rem; margin-bottom:20px;">
+        You haven't placed any orders yet. Explore our handcrafted collections!
+      </p>
+      <a href="{{ url_for('shop') }}" class="btn btn-primary">Start Shopping</a>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

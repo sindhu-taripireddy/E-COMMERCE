@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<div style="max-width:800px; margin:50px auto 80px; padding:0 24px;">
+  
+  <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:40px; text-align:center; box-shadow:var(--shadow-md); position:relative; overflow:hidden;">
+    <div style="position:absolute; top:0; left:0; width:100%; height:6px; background:linear-gradient(90deg, var(--burgundy), var(--gold), var(--burgundy));"></div>
+
+    <!-- Celebration Icon -->
+    <div style="width:76px; height:76px; background:#EBF7EE; color:#198754; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:2.2rem; border:2px solid #C3E6CB;">
+      <i class="fas fa-check"></i>
+    </div>
+
+    <span style="color:var(--gold-dark); font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; font-weight:700;">
+      Order Successfully Placed
+    </span>
+    <h1 style="font-size:2.2rem; color:var(--burgundy-dark); margin:8px 0 16px;">Thank You, {{ order.customer_name }}! 💕</h1>
+    <p style="color:var(--charcoal-light); font-size:0.95rem; max-width:550px; margin:0 auto 24px;">
+      Your handcrafted accessories order has been received and sent to our artisan workshop. We've emailed you the complete details.
+    </p>
+
+    <!-- Tracking Pill -->
+    <div style="background:var(--cream); border:1.5px dashed var(--gold); border-radius:8px; padding:18px; max-width:440px; margin:0 auto 30px;">
+      <div style="font-size:0.8rem; color:var(--gray-muted); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Tracking Number</div>
+      <div style="font-size:1.6rem; font-weight:700; color:var(--burgundy); letter-spacing:1px; margin:4px 0;">
+        #{{ order.tracking_number }}
+      </div>
+      <div style="font-size:0.82rem; color:#198754; font-weight:600;">
+        <i class="fas fa-shipping-fast"></i> Current Status: {{ order.order_status }}
+      </div>
+    </div>
+
+    <!-- Items Summary -->
+    <div style="text-align:left; border-top:1px solid var(--border-color); padding-top:24px; margin-bottom:30px;">
+      <h3 style="font-size:1.1rem; margin-bottom:16px;">Order Details ({{ order['items']|length }} items)</h3>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        {% for item in order['items'] %}
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
+            <div>
+              <strong>{{ item.product_name }}</strong> 
+              {% if item.color %}<span style="color:var(--gray-muted);">({{ item.color }})</span>{% endif %}
+              <span style="color:var(--gray-muted);">x {{ item.quantity }}</span>
+            </div>
+            <div style="font-weight:700; color:var(--burgundy);">₹{{ item.subtotal }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div style="border-top:1px solid var(--border-color); margin-top:16px; padding-top:12px; display:flex; justify-content:space-between; font-weight:700; font-size:1.1rem; color:var(--burgundy);">
+        <span>Total Amount Paid ({{ order.payment_method }})</span>
+        <span>₹{{ order.total_amount }}</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+      <a href="{{ url_for('track_order_direct', tracking_number=order.tracking_number) }}" class="btn btn-primary">
+        <i class="fas fa-map-marker-alt"></i> TRACK ORDER TIMELINE
+      </a>
+      <a href="{{ url_for('shop') }}" class="btn btn-secondary">
+        <i class="fas fa-shopping-bag"></i> CONTINUE SHOPPING
+      </a>
+      <button class="btn btn-outline-gold" style="color:var(--burgundy); border-color:var(--burgundy);"
+              onclick="window.openKKAssistant('Where is my order #{{ order.tracking_number }}')">
+        <i class="fas fa-robot"></i> ASK KK AI ABOUT THIS ORDER
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

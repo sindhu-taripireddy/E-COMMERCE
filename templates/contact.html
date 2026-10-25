@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<div style="background:var(--cream); padding:30px 24px; text-align:center; border-bottom:1px solid var(--border-color);">
+  <h1 style="font-size:2rem; color:var(--burgundy-dark); margin:0;">Contact Customer Care</h1>
+  <p style="color:var(--gray-muted); font-size:0.88rem; margin-top:4px;">
+    We're here to assist with custom orders, bridal sizing, or order inquiries.
+  </p>
+</div>
+
+<div style="max-width:1000px; margin:40px auto 80px; padding:0 24px;">
+
+  <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:40px;">
+    
+    <!-- Contact Info Cards -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm);">
+        <h3 style="font-size:1.15rem; color:var(--burgundy); margin-bottom:16px;">Direct Studio Inquiries</h3>
+        
+        <div style="display:flex; flex-direction:column; gap:16px; font-size:0.9rem;">
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="width:36px; height:36px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--burgundy); flex-shrink:0;">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div>
+              <strong>Email Support</strong><br>
+              <a href="mailto:care@kkcollections.com" style="color:var(--gold-dark);">care@kkcollections.com</a>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="width:36px; height:36px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--burgundy); flex-shrink:0;">
+              <i class="fab fa-whatsapp" style="color:#25D366; font-size:1.2rem;"></i>
+            </div>
+            <div>
+              <strong>WhatsApp Business Hotline</strong><br>
+              <a href="https://wa.me/919876543210" target="_blank" style="color:var(--gold-dark);">+91 98765 43210</a>
+              <div style="font-size:0.78rem; color:var(--gray-muted);">Direct chat for saree swatch matching</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="width:36px; height:36px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--burgundy); flex-shrink:0;">
+              <i class="fab fa-instagram" style="color:#E1306C; font-size:1.2rem;"></i>
+            </div>
+            <div>
+              <strong>Instagram Direct Message</strong><br>
+              <a href="{{ instagram_url }}" target="_blank" style="color:var(--gold-dark);">@kk_collectons</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick AI Helper Card -->
+      <div style="background:linear-gradient(135deg, var(--burgundy-dark), var(--burgundy)); color:#FFF; border-radius:var(--radius-md); padding:24px; border:1px solid var(--gold);">
+        <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:8px;">Need Instant Answers?</h4>
+        <p style="font-size:0.85rem; color:var(--beige); margin-bottom:16px;">
+          Our built-in KK AI Assistant answers questions about shipping, bangles sizes, return policies, and live order tracking 24/7.
+        </p>
+        <button class="btn btn-outline-gold" style="width:100%;" onclick="window.openKKAssistant('What are your shipping policies?')">
+          <i class="fas fa-sparkles"></i> Open KK AI Assistant
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Contact Form -->
+    <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:32px; box-shadow:var(--shadow-sm);">
+      <h3 style="font-size:1.3rem; margin-bottom:20px; color:var(--burgundy);">Send Us a Message</h3>
+      
+      <form onsubmit="event.preventDefault(); window.showToast('Thank you! Your message has been sent to our team. 💕'); this.reset();">
+        <div class="form-group">
+          <label>Your Name *</label>
+          <input type="text" class="form-control" placeholder="Priya Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" class="form-control" placeholder="priya@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone / WhatsApp Number</label>
+          <input type="tel" class="form-control" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="form-group">
+          <label>Subject</label>
+          <select class="form-control">
+            <option>Bridal / Custom Color Order</option>
+            <option>Order Status Inquiry</option>
+            <option>Exchange / Size Issue</option>
+            <option>Other Feedback</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Message *</label>
+          <textarea class="form-control" rows="4" placeholder="Tell us how we can help..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

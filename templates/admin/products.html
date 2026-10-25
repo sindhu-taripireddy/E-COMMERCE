@@ -1,0 +1,231 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Product Catalog Management — KK_COLLECTIONS Admin{% endblock %}
+{% block page_title %}Catalog & Product Management{% endblock %}
+
+{% block content %}
+
+<div class="admin-card-table">
+  
+  <div class="table-header-row">
+    <div>
+      <h3>Accessory Inventory ({{ products|length }} Items)</h3>
+      <span style="font-size:0.8rem; color:var(--admin-text-muted);">Manage prices, stock levels, variants, and descriptions</span>
+    </div>
+
+    <button class="btn btn-primary" id="btn-open-add-product" style="padding:10px 20px; font-size:0.88rem;">
+      <i class="fas fa-plus"></i> Add New Product
+    </button>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Discount</th>
+        <th>Stock</th>
+        <th>Occasion</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for prod in products %}
+        <tr>
+          <td>
+            <img src="{{ url_for('static', filename='images/products/' + prod.image) }}" alt=""
+                 style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--admin-border);">
+          </td>
+          <td>
+            <strong>{{ prod.product_name }}</strong>
+            <div style="font-size:0.75rem; color:var(--admin-text-muted);">ID: #{{ prod.product_id }}</div>
+          </td>
+          <td>{{ prod.category_name }}</td>
+          <td style="font-weight:700;">₹{{ prod.price }}</td>
+          <td>{% if prod.discount > 0 %}<span style="color:#198754; font-weight:700;">{{ prod.discount }}% OFF</span>{% else %}-{% endif %}</td>
+          <td>
+            <span class="status-pill {% if prod.stock > 5 %}status-in-stock{% elif prod.stock > 0 %}status-low-stock{% else %}status-out-of-stock{% endif %}">
+              {{ prod.stock }} units
+            </span>
+          </td>
+          <td>{{ prod.occasion or 'Traditional' }}</td>
+          <td>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-edit-product" data-product='{{ prod|tojson|safe }}'
+                      style="background:#E8F4F8; color:#0C5460; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.8rem; font-weight:600;">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              
+              <form method="POST" action="{{ url_for('admin_product_delete', product_id=prod.product_id) }}" onsubmit="return confirm('Are you sure you want to delete this piece?');" style="display:inline;">
+                <button type="submit" style="background:#F8D7DA; color:#721C24; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+<!-- Modal: Add Product -->
+<div class="admin-modal-backdrop" id="modal-add-product">
+  <div class="admin-modal-card">
+    <div class="admin-modal-header">
+      <h3>Add New Fashion Accessory</h3>
+      <button class="close-modal-btn">&times;</button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin_product_add') }}">
+      
+      <div class="form-group">
+        <label>Product Title *</label>
+        <input type="text" name="product_name" class="form-control" placeholder="e.g. Royal Ruby Silk Thread Bangles (Set of 6)" required>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category_id" class="form-control" required>
+            {% for cat in categories %}
+              <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Occasion *</label>
+          <select name="occasion" class="form-control">
+            <option>Wedding</option>
+            <option>Festive</option>
+            <option>Party Wear</option>
+            <option>Traditional</option>
+            <option>Daily Wear</option>
+            <option>Haldi</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>Price (₹) *</label>
+          <input type="number" step="1" name="price" class="form-control" placeholder="399" required>
+        </div>
+
+        <div class="form-group">
+          <label>Discount (%)</label>
+          <input type="number" step="1" name="discount" class="form-control" placeholder="10" value="0">
+        </div>
+
+        <div class="form-group">
+          <label>Initial Stock *</label>
+          <input type="number" name="stock" class="form-control" placeholder="25" value="20" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Material & Craft</label>
+        <input type="text" name="material" class="form-control" placeholder="e.g. Pure Silk Thread, Brass Core, Kundan Stones">
+      </div>
+
+      <div class="form-group">
+        <label>Product Image File</label>
+        <select name="image" class="form-control">
+          <option value="bangles_thread_red.jpg">Classic Red Silk Thread Bangles</option>
+          <option value="bangles_thread_pink.jpg">Rani Pink Silk Bangles</option>
+          <option value="bangles_thread_green.jpg">Emerald Green Silk Bangles</option>
+          <option value="bangles_thread_blue.jpg">Royal Blue Kundan Bangles</option>
+          <option value="bangles_thread_gold.jpg">Golden Velvet Thread Bangles</option>
+          <option value="bangles_designer_kundan.jpg">Designer Kundan Chura</option>
+          <option value="bangles_bridal_heavy.jpg">Royal Bridal Chura</option>
+          <option value="earrings_thread_jhumka_pink.jpg">Pink Silk Thread Jhumkas</option>
+          <option value="earrings_bridal_chandbali.jpg">Bridal Chandbali Earrings</option>
+          <option value="chains_invisible_crystal.jpg">Solitaire Invisible Chain</option>
+          <option value="combo_bridal_set.jpg">Bridal Complete Combo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Product Description *</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="Artisanal details, pairing suggestions, and care..." required></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+        <button type="button" class="btn btn-secondary close-btn-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Accessory</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Product -->
+<div class="admin-modal-backdrop" id="modal-edit-product">
+  <div class="admin-modal-card">
+    <div class="admin-modal-header">
+      <h3>Edit Product Details</h3>
+      <button class="close-modal-btn">&times;</button>
+    </div>
+
+    <form method="POST" action="">
+      <div class="form-group">
+        <label>Product Title</label>
+        <input type="text" name="product_name" class="form-control" required>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category_id" class="form-control">
+            {% for cat in categories %}
+              <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Occasion</label>
+          <input type="text" name="occasion" class="form-control">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input type="number" step="1" name="price" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label>Discount (%)</label>
+          <input type="number" step="1" name="discount" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" name="stock" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Material</label>
+        <input type="text" name="material" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" class="form-control" rows="3" required></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+        <button type="button" class="btn btn-secondary close-btn-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

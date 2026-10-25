@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}KK_COLLECTIONS — Elegance That Completes You | Luxury Fashion Accessories{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-ornament"></div>
+  <span class="hero-subtitle">Handcrafted Artisanal Accessories</span>
+  <h1 class="hero-title">Elegance That Completes You</h1>
+  <p class="hero-tagline">
+    Discover timeless silk thread bangles, intricate heritage jhumkas, and minimal invisible chains handcrafted to perfection for your festive and wedding milestones.
+  </p>
+  <div class="hero-buttons">
+    <a href="{{ url_for('shop') }}" class="btn btn-primary">
+      <i class="fas fa-shopping-bag"></i> SHOP NOW
+    </a>
+    <a href="{{ url_for('shop', category='collections') }}" class="btn btn-outline-gold">
+      <i class="fas fa-sparkles"></i> EXPLORE COLLECTIONS
+    </a>
+  </div>
+</section>
+
+<!-- Brand Promises Bar -->
+<div class="promises-bar">
+  <div class="promises-grid">
+    <div class="promise-item">
+      <div class="promise-icon"><i class="fas fa-gem"></i></div>
+      <div class="promise-text">
+        <h4>100% Handcrafted</h4>
+        <p>Premium silk threads & authentic kundan</p>
+      </div>
+    </div>
+    <div class="promise-item">
+      <div class="promise-icon"><i class="fas fa-shipping-fast"></i></div>
+      <div class="promise-text">
+        <h4>Free All-India Shipping</h4>
+        <p>Complimentary on orders above ₹499</p>
+      </div>
+    </div>
+    <div class="promise-item">
+      <div class="promise-icon"><i class="fas fa-robot"></i></div>
+      <div class="promise-text">
+        <h4>KK AI Assistant</h4>
+        <p>Instant matching & budget recommendations</p>
+      </div>
+    </div>
+    <div class="promise-item">
+      <div class="promise-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="promise-text">
+        <h4>Hassle-Free Returns</h4>
+        <p>7-day easy exchange & size guarantee</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Shop By Category -->
+<section class="categories-section">
+  <div class="section-header">
+    <span class="section-pretitle">Artisanal Collections</span>
+    <h2 class="section-title">Shop By Category</h2>
+  </div>
+
+  <div class="categories-grid">
+    {% for cat in categories %}
+      <div class="category-card">
+        <div class="category-img-wrap">
+          <img src="{{ url_for('static', filename='images/products/' + cat.image) }}" alt="{{ cat.name }}">
+        </div>
+        <div class="category-info">
+          <h3>{{ cat.name }}</h3>
+          <p>{{ cat.description }}</p>
+          <a href="{{ url_for('shop', category=cat.slug) }}" class="category-link">
+            Explore {{ cat.name }} <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Featured / Best Sellers Section -->
+<section class="products-section" style="background-color: var(--white); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+  <div class="section-header">
+    <span class="section-pretitle">Customer Favorites</span>
+    <h2 class="section-title">Best Sellers</h2>
+  </div>
+
+  <div class="products-grid">
+    {% for product in featured_products[:4] %}
+      <div class="product-card">
+        <div class="product-media">
+          <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.product_name }}">
+          {% if product.discount > 0 %}
+            <span class="product-badge badge-discount">{{ product.discount }}% OFF</span>
+          {% elif product.is_featured %}
+            <span class="product-badge badge-bestseller">BESTSELLER</span>
+          {% endif %}
+          <button class="wishlist-heart-btn" data-product-id="{{ product.product_id }}" title="Save to Wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+        </div>
+
+        <div class="product-body">
+          <span class="product-cat-tag">{{ product.category_name }}</span>
+          <a href="{{ url_for('product_detail', product_id=product.product_id) }}">
+            <h3 class="product-title">{{ product.product_name }}</h3>
+          </a>
+          
+          <div class="product-rating">
+            {% for i in range(5) %}
+              <i class="fas fa-star star-icon"></i>
+            {% endfor %}
+            <span style="color:var(--gray-muted); margin-left:4px;">({{ product.rating }})</span>
+          </div>
+
+          <div class="product-price-row">
+            <span class="final-price">₹{{ product.final_price }}</span>
+            {% if product.discount > 0 %}
+              <span class="original-price">₹{{ product.price }}</span>
+              <span class="discount-pill">Save {{ product.discount }}%</span>
+            {% endif %}
+          </div>
+
+          <div class="product-actions">
+            <button class="add-to-cart-btn" data-product-id="{{ product.product_id }}">
+              <i class="fas fa-shopping-bag"></i> Add to Cart
+            </button>
+            <a href="{{ url_for('product_detail', product_id=product.product_id) }}" class="quick-view-btn" title="View Details">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- AI Shopping Assistant Feature Banner -->
+<section class="ai-banner-section">
+  <div class="ai-banner-content">
+    <div class="ai-banner-text">
+      <span style="color:var(--gold-light); font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; font-weight:700;">
+        Powered by AI Discovery
+      </span>
+      <h2>Not sure what to choose?<br>Ask KK AI 🤖</h2>
+      <p>
+        Tell our intelligent shopping assistant about your outfit color, upcoming wedding occasion, or budget. We'll search the live KK_COLLECTIONS catalog and suggest the perfect matching accessories!
+      </p>
+
+      <div class="ai-sample-chips">
+        <button class="sample-chip" onclick="window.openKKAssistant('Find earrings under ₹300')">
+          <i class="fas fa-sparkles"></i> "Find earrings under ₹300"
+        </button>
+        <button class="sample-chip" onclick="window.openKKAssistant('I am wearing a green saree. What matches?')">
+          <i class="fas fa-sparkles"></i> "What matches my green saree?"
+        </button>
+        <button class="sample-chip" onclick="window.openKKAssistant('Show me bridal bangles')">
+          <i class="fas fa-sparkles"></i> "Show me bridal bangles"
+        </button>
+        <button class="sample-chip" onclick="window.openKKAssistant('Can you create a matching set?')">
+          <i class="fas fa-sparkles"></i> "Create a matching combo set"
+        </button>
+      </div>
+
+      <button class="btn btn-primary" onclick="window.openKKAssistant('Hi! Can you help me find matching accessories?')">
+        <i class="fas fa-comment-dots"></i> CHAT WITH KK AI
+      </button>
+    </div>
+
+    <div style="flex:1; min-width:280px; max-width:400px; text-align:center;">
+      <div style="background:rgba(255,255,255,0.06); border:1.5px solid var(--gold); border-radius:16px; padding:28px 24px; box-shadow:0 12px 32px rgba(0,0,0,0.3);">
+        <div style="width:64px; height:64px; background:linear-gradient(135deg, var(--gold), #9A7734); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:1.8rem; color:#2D0814;">
+          <i class="fas fa-robot"></i>
+        </div>
+        <h3 style="color:#FFF; font-size:1.3rem; margin-bottom:8px;">Instant Fashion Advice</h3>
+        <p style="font-size:0.85rem; color:var(--beige); margin-bottom:16px;">
+          Ground truth recommendations straight from our inventory. No guesswork, no hallucinations.
+        </p>
+        <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; font-size:0.8rem; color:var(--gold-light); text-align:left;">
+          <i class="fas fa-check-circle" style="color:#2ECC71;"></i> Saree Color Harmony <br>
+          <i class="fas fa-check-circle" style="color:#2ECC71;"></i> Strict Budget Filtering <br>
+          <i class="fas fa-check-circle" style="color:#2ECC71;"></i> Live Order Status Tracking
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trending Now Section -->
+<section class="products-section">
+  <div class="section-header">
+    <span class="section-pretitle">Festive Season Edit</span>
+    <h2 class="section-title">Trending Now</h2>
+  </div>
+
+  <div class="products-grid">
+    {% for product in trending_products[:4] %}
+      <div class="product-card">
+        <div class="product-media">
+          <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.product_name }}">
+          {% if product.is_new %}
+            <span class="product-badge badge-new">NEW</span>
+          {% elif product.discount > 0 %}
+            <span class="product-badge badge-discount">{{ product.discount }}% OFF</span>
+          {% endif %}
+          <button class="wishlist-heart-btn" data-product-id="{{ product.product_id }}" title="Save to Wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+        </div>
+
+        <div class="product-body">
+          <span class="product-cat-tag">{{ product.category_name }}</span>
+          <a href="{{ url_for('product_detail', product_id=product.product_id) }}">
+            <h3 class="product-title">{{ product.product_name }}</h3>
+          </a>
+
+          <div class="product-rating">
+            {% for i in range(5) %}
+              <i class="fas fa-star star-icon"></i>
+            {% endfor %}
+            <span style="color:var(--gray-muted); margin-left:4px;">({{ product.rating }})</span>
+          </div>
+
+          <div class="product-price-row">
+            <span class="final-price">₹{{ product.final_price }}</span>
+            {% if product.discount > 0 %}
+              <span class="original-price">₹{{ product.price }}</span>
+              <span class="discount-pill">Save {{ product.discount }}%</span>
+            {% endif %}
+          </div>
+
+          <div class="product-actions">
+            <button class="add-to-cart-btn" data-product-id="{{ product.product_id }}">
+              <i class="fas fa-shopping-bag"></i> Add to Cart
+            </button>
+            <a href="{{ url_for('product_detail', product_id=product.product_id) }}" class="quick-view-btn" title="View Details">
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Instagram Showcase Section -->
+<section class="instagram-section">
+  <div class="section-header">
+    <span class="section-pretitle">Connect With Us</span>
+    <h2 class="section-title">Follow KK_COLLECTIONS</h2>
+  </div>
+
+  <a href="{{ instagram_url }}" target="_blank" class="instagram-handle">
+    <i class="fab fa-instagram" style="font-size:1.4rem;"></i>
+    <span>@kk_collectons on Instagram</span>
+    <i class="fas fa-external-link-alt" style="font-size:0.8rem;"></i>
+  </a>
+
+  <div class="instagram-grid">
+    <a href="{{ instagram_url }}" target="_blank" class="insta-post-card">
+      <img src="{{ url_for('static', filename='images/products/bangles_peacock_teal_thread.jpg') }}" alt="Peacock Teal Thread Bangles">
+      <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
+    </a>
+    <a href="{{ instagram_url }}" target="_blank" class="insta-post-card">
+      <img src="{{ url_for('static', filename='images/products/bangles_silver_grey_kundan.jpg') }}" alt="Silver Grey Kundan Bangles">
+      <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
+    </a>
+    <a href="{{ instagram_url }}" target="_blank" class="insta-post-card">
+      <img src="{{ url_for('static', filename='images/products/combo_antique_temple_pearl.jpg') }}" alt="Temple Jewelry Combo">
+      <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
+    </a>
+    <a href="{{ instagram_url }}" target="_blank" class="insta-post-card">
+      <img src="{{ url_for('static', filename='images/products/chains_invisible_floral_ruby.jpg') }}" alt="Floral Ruby Invisible Chain">
+      <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
+    </a>
+    <a href="{{ instagram_url }}" target="_blank" class="insta-post-card">
+      <img src="{{ url_for('static', filename='images/products/chains_invisible_floral_worn.jpg') }}" alt="Invisible Chain Model Style">
+      <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
+    </a>
+    <a href="{{ instagram_url }}" target="_blank" class="insta-post-card">
+      <img src="{{ url_for('static', filename='images/products/bangles_bridal_heavy.jpg') }}" alt="Bridal Chura Set">
+      <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
+    </a>
+  </div>
+</section>
+
+{% endblock %}

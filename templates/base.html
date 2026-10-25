@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ store_name }} — {{ tagline }}{% endblock %}</title>
+  
+  <!-- Google Fonts: Playfair Display + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="marquee-text">
+      <span>✨ Complimentary All-India Shipping on Orders Over ₹499 • Use Code <strong>KKFIRST10</strong> for 10% Off ✨</span>
+    </div>
+    <div class="social-links">
+      <a href="{{ instagram_url }}" target="_blank" title="Follow us on Instagram">
+        <i class="fab fa-instagram"></i> @kk_collectons
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Site Header -->
+  <header class="site-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo -->
+      <a href="{{ url_for('home') }}" class="brand-logo">
+        <div class="logo-monogram">KK</div>
+        <div class="brand-text">
+          <span class="brand-title">{{ store_name }}</span>
+          <span class="brand-subtitle">{{ secondary_tagline }}</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="main-nav">
+        <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('shop') }}" class="nav-link {% if request.endpoint == 'shop' and not request.args.get('category') %}active{% endif %}">Shop All</a>
+        <a href="{{ url_for('shop', category='bangles') }}" class="nav-link {% if request.args.get('category') == 'bangles' %}active{% endif %}">Bangles</a>
+        <a href="{{ url_for('shop', category='earrings') }}" class="nav-link {% if request.args.get('category') == 'earrings' %}active{% endif %}">Earrings</a>
+        <a href="{{ url_for('shop', category='chains') }}" class="nav-link {% if request.args.get('category') == 'chains' %}active{% endif %}">Chains</a>
+        <a href="{{ url_for('shop', category='collections') }}" class="nav-link {% if request.args.get('category') == 'collections' %}active{% endif %}">Collections</a>
+        <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a>
+        <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">Contact</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <!-- AI Assistant Pill in Header -->
+        <button class="ai-header-btn" id="header-ai-btn" title="Ask KK AI Assistant">
+          <i class="fas fa-sparkles"></i>
+          <span>KK AI</span>
+        </button>
+
+        <!-- Search Icon (Links to Shop) -->
+        <a href="{{ url_for('shop') }}" class="action-btn" title="Search Catalog">
+          <i class="fas fa-search"></i>
+        </a>
+
+        <!-- Wishlist -->
+        <a href="{{ url_for('wishlist_view') }}" class="action-btn" title="My Wishlist">
+          <i class="far fa-heart"></i>
+          <span class="badge-count" id="header-wishlist-count">{{ wishlist_count }}</span>
+        </a>
+
+        <!-- Cart -->
+        <a href="{{ url_for('cart_view') }}" class="action-btn" title="Shopping Bag">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="badge-count" id="header-cart-count">{{ cart_count }}</span>
+        </a>
+
+        <!-- User Profile / Auth -->
+        {% if is_authenticated %}
+          <div style="position: relative; display: inline-block;">
+            <a href="{{ url_for('my_orders') }}" class="action-btn" title="Hello, {{ current_user_name }}!">
+              <i class="fas fa-user-circle"></i>
+            </a>
+          </div>
+          <a href="{{ url_for('logout') }}" style="font-size:0.8rem; color:var(--burgundy); font-weight:600;" title="Sign out">
+            Sign Out
+          </a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="action-btn" title="Sign In">
+            <i class="far fa-user"></i>
+          </a>
+        {% endif %}
+
+        {% if is_admin %}
+          <a href="{{ url_for('admin_dashboard') }}" style="font-size:0.75rem; background:var(--burgundy); color:#FFF; padding:4px 8px; border-radius:4px;" title="Seller Portal">
+            Seller Portal
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Flash Alerts -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+            <button style="background:none;border:none;cursor:pointer;" onclick="this.parentElement.remove()">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Page Main Content Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      
+      <div class="footer-brand">
+        <div class="brand-logo" style="margin-bottom:16px;">
+          <div class="logo-monogram" style="background:#5B1426; border-color:#C5A059;">KK</div>
+          <div class="brand-text">
+            <span class="brand-title" style="color:#FFF;">{{ store_name }}</span>
+            <span class="brand-subtitle" style="color:#C5A059;">{{ secondary_tagline }}</span>
+          </div>
+        </div>
+        <p>Handcrafted silk thread bangles, traditional jhumkas, and minimal invisible chains created with artisanal precision for your treasured milestones.</p>
+        <p style="font-size:0.85rem; color:#E0C27B;">
+          <i class="fas fa-envelope"></i> care@kkcollections.com <br>
+          <i class="fas fa-phone-alt"></i> +91 98765 43210 (Mon-Sat, 10am - 7pm)
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('shop') }}">Shop Catalog</a></li>
+          <li><a href="{{ url_for('about') }}">Our Story</a></li>
+          <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+          <li><a href="{{ url_for('track_order_page') }}">Track Your Order</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Customer Care</h4>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('faq') }}">Shipping & Delivery</a></li>
+          <li><a href="{{ url_for('faq') }}">Returns & Exchanges</a></li>
+          <li><a href="{{ url_for('faq') }}">Bangle Size Guide</a></li>
+          <li><a href="{{ url_for('faq') }}">Jewelry Care Guide</a></li>
+          <li><a href="{{ url_for('admin_login') }}">Seller Login</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Instagram Reference</h4>
+        <p style="font-size:0.85rem; color:#C8B8A6; margin-bottom:14px;">
+          Explore real creations, saree combinations, and customer tags directly on our Instagram feed.
+        </p>
+        <a href="{{ instagram_url }}" target="_blank" class="btn btn-outline-gold" style="padding:8px 16px; font-size:0.82rem;">
+          <i class="fab fa-instagram"></i> Follow @kk_collectons
+        </a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 KK_COLLECTIONS. All Rights Reserved. Crafted for Indian Fashion Elegance.</div>
+      <div>Designed for Live Hackathon Presentation with Built-in AI Shopping Assistant.</div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       AI SHOPPING ASSISTANT ("KK AI") FLOATING WIDGET
+       ========================================================================= -->
+  <div class="kk-ai-floating-trigger" id="kk-ai-floating-btn" title="Chat with KK AI Shopping Assistant">
+    <div class="ai-pulse-dot"></div>
+    <i class="fas fa-comment-dots" style="font-size:1.1rem; color:#E0C27B;"></i>
+    <span>💬 KK AI</span>
+  </div>
+
+  <!-- Chat Drawer Modal -->
+  <div class="kk-ai-modal" id="kk-ai-modal">
+    <!-- Header -->
+    <div class="kk-ai-header">
+      <div class="ai-header-info">
+        <div class="ai-avatar-circle">
+          <i class="fas fa-sparkles"></i>
+        </div>
+        <div class="ai-header-titles">
+          <h4>KK AI Assistant 🤖</h4>
+          <p>Your personal KK_COLLECTIONS shopping assistant</p>
+        </div>
+      </div>
+      <div class="ai-header-controls">
+        <button class="ai-control-btn" id="ai-reset-btn" title="Clear chat history">
+          <i class="fas fa-redo-alt"></i>
+        </button>
+        <button class="ai-control-btn" id="ai-close-btn" title="Minimize">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="kk-ai-messages" id="kk-ai-messages">
+      <!-- Populated dynamically by chatbot.js -->
+    </div>
+
+    <!-- Quick Action Chips -->
+    <div class="kk-ai-chips-wrapper" id="kk-ai-chips">
+      <button class="ai-chip" data-query="Show me thread bangles">Shop Bangles</button>
+      <button class="ai-chip" data-query="Show me earrings">Shop Earrings</button>
+      <button class="ai-chip" data-query="Show me items under ₹300">Under ₹300</button>
+      <button class="ai-chip" data-query="Recommend accessories for a wedding">Wedding Collection</button>
+      <button class="ai-chip" data-query="Where is my order?">Track My Order</button>
+      <button class="ai-chip" data-query="Show me new arrivals">New Arrivals</button>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="kk-ai-input-bar">
+      <input type="text" class="kk-ai-input" id="kk-ai-input" placeholder="Ask me anything about our products..." autocomplete="off">
+      <button class="kk-ai-send-btn" id="kk-ai-send-btn" title="Send query">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

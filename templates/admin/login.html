@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Login — KK_COLLECTIONS Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <style>
+    body {
+      background: radial-gradient(circle at center, #350B17 0%, #15050A 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="background:#FFFFFF; border-radius:12px; width:440px; max-width:90vw; padding:36px; box-shadow:0 16px 40px rgba(0,0,0,0.5); border:1px solid #C5A059;">
+    
+    <div style="text-align:center; margin-bottom:24px;">
+      <div class="logo-monogram" style="margin:0 auto 12px; width:52px; height:52px; font-size:1.5rem; background:#5B1426; color:#C5A059; border:1.5px solid #C5A059; border-radius:50%; display:flex; align-items:center; justify-content:center;">KK</div>
+      <h2 style="font-family:'Playfair Display', serif; color:#5B1426; margin:0;">Seller Management Portal</h2>
+      <p style="font-size:0.82rem; color:#6C757D; margin-top:4px;">Protected Administration Access</p>
+    </div>
+
+    <!-- Demo Admin Credentials Callout -->
+    <div style="background:#FFF9E6; border:1px dashed #C5A059; border-radius:6px; padding:12px; margin-bottom:20px; font-size:0.82rem; color:#856404;">
+      <strong>Administrator Demo Login:</strong><br>
+      Email: <code>admin@kkcollections.com</code><br>
+      Password: <code>admin123</code>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="padding:10px 14px; border-radius:6px; margin-bottom:14px; font-size:0.85rem; background:{% if category == 'danger' %}#FDF2F2;color:#DC3545;border:1px solid #F8D7DA;{% else %}#EBF7EE;color:#198754;{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('admin_login') }}">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Admin Email</label>
+        <input type="email" name="email" class="form-control" value="admin@kkcollections.com" required style="width:100%; padding:10px; border:1px solid #E8DFD3; border-radius:6px; box-sizing:border-box;">
+      </div>
+
+      <div class="form-group" style="margin-bottom:20px;">
+        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Password</label>
+        <input type="password" name="password" class="form-control" value="admin123" required style="width:100%; padding:10px; border:1px solid #E8DFD3; border-radius:6px; box-sizing:border-box;">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:0.92rem; background:#5B1426; color:#FFF; border:none; border-radius:6px; cursor:pointer;">
+        <i class="fas fa-lock"></i> Sign In to Dashboard
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:20px; font-size:0.82rem;">
+      <a href="{{ url_for('home') }}" style="color:#5B1426; text-decoration:underline;">&larr; Return to Storefront</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Seller Admin Portal — KK_COLLECTIONS{% endblock %}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo-monogram">KK</div>
+      <div class="sidebar-title">
+        <h3>KK_COLLECTIONS</h3>
+        <span>Seller Management</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+        <a href="{{ url_for('admin_dashboard') }}">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+      </li>
+      <li class="sidebar-nav-item {% if request.endpoint == 'admin_products' %}active{% endif %}">
+        <a href="{{ url_for('admin_products') }}">
+          <i class="fas fa-gem"></i> Products
+        </a>
+      </li>
+      <li class="sidebar-nav-item {% if request.endpoint == 'admin_inventory' %}active{% endif %}">
+        <a href="{{ url_for('admin_inventory') }}">
+          <i class="fas fa-boxes"></i> Inventory
+        </a>
+      </li>
+      <li class="sidebar-nav-item {% if request.endpoint == 'admin_orders' %}active{% endif %}">
+        <a href="{{ url_for('admin_orders') }}">
+          <i class="fas fa-shopping-bag"></i> Orders
+        </a>
+      </li>
+      <li class="sidebar-nav-item {% if request.endpoint == 'admin_customers' %}active{% endif %}">
+        <a href="{{ url_for('admin_customers') }}">
+          <i class="fas fa-users"></i> Customers
+        </a>
+      </li>
+      <li class="sidebar-nav-item {% if request.endpoint == 'admin_analytics' %}active{% endif %}">
+        <a href="{{ url_for('admin_analytics') }}">
+          <i class="fas fa-chart-line"></i> Analytics
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="{{ url_for('home') }}" target="_blank" class="store-link-btn">
+        <i class="fas fa-external-link-alt"></i> View Live Storefront
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-page-title">
+        <h2>{% block page_title %}Management Portal{% endblock %}</h2>
+      </div>
+      <div class="admin-user-pill">
+        <span class="admin-user-name">
+          <i class="fas fa-user-shield" style="color:var(--admin-gold); margin-right:6px;"></i>
+          {{ session.get('admin_name', 'Store Administrator') }}
+        </span>
+        <a href="{{ url_for('admin_logout') }}" class="admin-logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <!-- Flash Alerts -->
+    <div style="padding: 16px 32px 0;">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div style="padding:12px 18px; border-radius:6px; margin-bottom:12px; font-size:0.88rem; background:{% if category == 'success' %}#EBF7EE;color:#198754;border:1px solid #C3E6CB;{% elif category == 'danger' %}#FDF2F2;color:#DC3545;border:1px solid #F8D7DA;{% else %}#FFF9E6;color:#856404;border:1px solid #FFEEBA;{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="admin-content-wrap">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,85 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Inventory & Stock Control — KK_COLLECTIONS Admin{% endblock %}
+{% block page_title %}Real-time Inventory & Variants{% endblock %}
+
+{% block content %}
+
+<div class="admin-card-table">
+  
+  <div class="table-header-row">
+    <div>
+      <h3>Inventory Status ({{ inventory|length }} Variants)</h3>
+      <span style="font-size:0.8rem; color:var(--admin-text-muted);">Stock levels mapped across colors, bangle sizes, and SKUs</span>
+    </div>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Product Name</th>
+        <th>Color</th>
+        <th>Size</th>
+        <th>Stock Units</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in inventory %}
+        <tr>
+          <td><code style="background:#F0F0F0; padding:3px 6px; border-radius:3px; font-size:0.8rem;">{{ item.sku or 'KK-GEN-' ~ item.variant_id }}</code></td>
+          <td style="font-weight:600;">{{ item.product_name }}</td>
+          <td>{{ item.color or 'Standard' }}</td>
+          <td><strong>{{ item.size or 'Free Size' }}</strong></td>
+          <td style="font-weight:700; font-size:0.95rem;">{{ item.stock }}</td>
+          <td>
+            {% if item.stock > 5 %}
+              <span class="status-pill status-in-stock">🟢 In Stock</span>
+            {% elif item.stock > 0 %}
+              <span class="status-pill status-low-stock">🟡 Low Stock</span>
+            {% else %}
+              <span class="status-pill status-out-of-stock">🔴 Out of Stock</span>
+            {% endif %}
+          </td>
+          <td>
+            <button class="btn-edit-stock" data-variant-id="{{ item.variant_id }}" data-current-stock="{{ item.stock }}" data-variant-title="{{ item.product_name }} ({{ item.color }} - {{ item.size }})"
+                    style="background:var(--admin-burgundy); color:#FFF; border:none; padding:6px 12px; border-radius:4px; font-size:0.78rem; cursor:pointer;">
+              <i class="fas fa-cubes"></i> Update Stock
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+<!-- Modal: Edit Stock -->
+<div class="admin-modal-backdrop" id="modal-edit-stock">
+  <div class="admin-modal-card" style="width:400px;">
+    <div class="admin-modal-header">
+      <h3>Adjust Stock Level</h3>
+      <button class="close-modal-btn">&times;</button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin_inventory_update') }}">
+      <input type="hidden" name="variant_id" value="">
+      
+      <p id="stock-variant-title" style="font-weight:600; font-size:0.9rem; color:var(--admin-burgundy); margin-bottom:16px;"></p>
+
+      <div class="form-group">
+        <label>Available Stock Count</label>
+        <input type="number" name="stock" class="form-control" min="0" required>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+        <button type="button" class="btn btn-secondary close-btn-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

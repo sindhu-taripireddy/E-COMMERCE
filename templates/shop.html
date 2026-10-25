@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Shop Handcrafted Accessories — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<!-- Page Title Header -->
+<div style="background:linear-gradient(rgba(31,11,18,0.9), rgba(15,6,9,0.95)); padding:40px 24px; text-align:center; color:#FFF; border-bottom:1px solid var(--gold);">
+  <span style="color:var(--gold-light); font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; font-weight:600;">
+    The Catalog
+  </span>
+  <h1 style="color:#FFF; font-size:2.4rem; margin-top:6px;">
+    {% if active_category %}{{ active_category.name }}{% else %}All Handcrafted Accessories{% endif %}
+  </h1>
+  <p style="color:var(--beige); max-width:600px; margin:8px auto 0; font-size:0.9rem;">
+    {% if active_category %}{{ active_category.description }}{% else %}Browse our authentic silk thread bangles, jhumkas, invisible chains, and bespoke combo sets.{% endif %}
+  </p>
+</div>
+
+<div class="shop-layout">
+
+  <!-- Filters Sidebar -->
+  <aside class="filters-sidebar">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <h3 style="font-size:1.1rem; color:var(--burgundy);">Filters</h3>
+      <a href="{{ url_for('shop') }}" style="font-size:0.8rem; color:var(--gold-dark); text-decoration:underline;">Reset All</a>
+    </div>
+
+    <form method="GET" action="{{ url_for('shop') }}" id="shop-filter-form">
+      
+      <!-- Search -->
+      <div class="filter-group">
+        <label class="filter-title">Search</label>
+        <div style="position:relative;">
+          <input type="text" name="search" class="form-control" placeholder="Search bangles, jhumkas..." 
+                 value="{{ current_search or '' }}" style="padding-right:32px; font-size:0.85rem;">
+          <button type="submit" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--burgundy); cursor:pointer;">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="filter-group">
+        <label class="filter-title">Category</label>
+        <ul class="filter-options-list">
+          <li>
+            <label class="filter-label">
+              <input type="radio" name="category" value="" {% if not current_category %}checked{% endif %} onchange="this.form.submit()">
+              <span>All Categories</span>
+            </label>
+          </li>
+          {% for cat in categories %}
+            <li>
+              <label class="filter-label">
+                <input type="radio" name="category" value="{{ cat.slug }}" {% if current_category == cat.slug %}checked{% endif %} onchange="this.form.submit()">
+                <span>{{ cat.name }}</span>
+              </label>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Max Price Slider -->
+      <div class="filter-group">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label class="filter-title" style="margin:0;">Max Price</label>
+          <span id="price-slider-display" style="font-size:0.88rem; font-weight:700; color:var(--burgundy);">₹{{ current_max_price }}</span>
+        </div>
+        <input type="range" name="max_price" min="200" max="1500" step="50" value="{{ current_max_price }}" 
+               style="width:100%; accent-color:var(--burgundy);"
+               oninput="document.getElementById('price-slider-display').textContent = '₹' + this.value"
+               onchange="this.form.submit()">
+      </div>
+
+      <!-- Occasion -->
+      <div class="filter-group">
+        <label class="filter-title">Occasion</label>
+        <select name="occasion" class="form-control" style="font-size:0.85rem;" onchange="this.form.submit()">
+          <option value="">All Occasions</option>
+          {% for occ in ["Wedding", "Festive", "Party Wear", "Traditional", "Daily Wear", "Haldi"] %}
+            <option value="{{ occ }}" {% if current_occasion == occ %}selected{% endif %}>{{ occ }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Colors -->
+      <div class="filter-group">
+        <label class="filter-title">Color</label>
+        <div class="color-swatches">
+          {% for col in ["Red", "Pink", "Green", "Blue", "Gold", "Maroon", "Yellow"] %}
+            <button type="button" class="color-swatch-btn {% if current_color == col %}active{% endif %}"
+                    onclick="document.getElementById('filter-color-hidden').value = (document.getElementById('filter-color-hidden').value === '{{ col }}' ? '' : '{{ col }}'); document.getElementById('shop-filter-form').submit();">
+              {{ col }}
+            </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="color" id="filter-color-hidden" value="{{ current_color or '' }}">
+      </div>
+
+      <!-- Bangle Size -->
+      <div class="filter-group">
+        <label class="filter-title">Bangle Size</label>
+        <div class="size-pills">
+          {% for sz in ["2.4", "2.6", "2.8"] %}
+            <button type="button" class="size-pill-btn {% if current_size == sz %}active{% endif %}"
+                    onclick="document.getElementById('filter-size-hidden').value = (document.getElementById('filter-size-hidden').value === '{{ sz }}' ? '' : '{{ sz }}'); document.getElementById('shop-filter-form').submit();">
+              {{ sz }}
+            </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="size" id="filter-size-hidden" value="{{ current_size or '' }}">
+      </div>
+
+      <!-- Preserve Sort -->
+      <input type="hidden" name="sort_by" value="{{ current_sort }}">
+
+    </form>
+  </aside>
+
+  <!-- Products Main Content -->
+  <section>
+    
+    <!-- Top Bar: Result count & Sort -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+      <span style="font-size:0.9rem; color:var(--gray-muted);">
+        Showing <strong>{{ products|length }}</strong> handcrafted pieces
+      </span>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <label style="font-size:0.85rem; font-weight:600; color:var(--charcoal);">Sort by:</label>
+        <select class="form-control" style="width:auto; font-size:0.85rem; padding:6px 12px;" 
+                onchange="const form = document.getElementById('shop-filter-form'); form.querySelector('input[name=sort_by]').value = this.value; form.submit();">
+          <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Featured</option>
+          <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest Arrivals</option>
+          <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+          <option value="best_selling" {% if current_sort == 'best_selling' %}selected{% endif %}>Best Selling</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    {% if products %}
+      <div class="products-grid">
+        {% for product in products %}
+          <div class="product-card">
+            <div class="product-media">
+              <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.product_name }}">
+              {% if product.is_new %}
+                <span class="product-badge badge-new">NEW</span>
+              {% elif product.discount > 0 %}
+                <span class="product-badge badge-discount">{{ product.discount }}% OFF</span>
+              {% elif product.is_featured %}
+                <span class="product-badge badge-bestseller">BESTSELLER</span>
+              {% endif %}
+              <button class="wishlist-heart-btn" data-product-id="{{ product.product_id }}" title="Save to Wishlist">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+
+            <div class="product-body">
+              <span class="product-cat-tag">{{ product.category_name }} • {{ product.occasion }}</span>
+              <a href="{{ url_for('product_detail', product_id=product.product_id) }}">
+                <h3 class="product-title">{{ product.product_name }}</h3>
+              </a>
+
+              <div class="product-rating">
+                {% for i in range(5) %}
+                  <i class="fas fa-star star-icon"></i>
+                {% endfor %}
+                <span style="color:var(--gray-muted); margin-left:4px;">({{ product.rating }})</span>
+              </div>
+
+              <div class="product-price-row">
+                <span class="final-price">₹{{ product.final_price }}</span>
+                {% if product.discount > 0 %}
+                  <span class="original-price">₹{{ product.price }}</span>
+                  <span class="discount-pill">{{ product.discount }}% OFF</span>
+                {% endif %}
+              </div>
+
+              <div class="product-actions">
+                <button class="add-to-cart-btn" data-product-id="{{ product.product_id }}">
+                  <i class="fas fa-shopping-bag"></i> Add to Cart
+                </button>
+                <a href="{{ url_for('product_detail', product_id=product.product_id) }}" class="quick-view-btn" title="View Piece">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:60px 24px; text-align:center;">
+        <i class="fas fa-search" style="font-size:3rem; color:var(--gold); margin-bottom:16px;"></i>
+        <h3 style="font-size:1.4rem; color:var(--burgundy); margin-bottom:8px;">No matching accessories found</h3>
+        <p style="color:var(--gray-muted); font-size:0.9rem; max-width:400px; margin:0 auto 20px;">
+          Try broadening your search or ask our KK AI Assistant for personalized recommendations!
+        </p>
+        <button class="btn btn-primary" onclick="window.openKKAssistant('Show me available accessories')">
+          <i class="fas fa-sparkles"></i> Ask KK AI Assistant
+        </button>
+      </div>
+    {% endif %}
+
+  </section>
+
+</div>
+
+{% endblock %}

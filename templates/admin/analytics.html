@@ -1,0 +1,109 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Sales Analytics & Insights — KK_COLLECTIONS Admin{% endblock %}
+{% block page_title %}Store Sales & Revenue Analytics{% endblock %}
+
+{% block content %}
+
+<!-- Metrics Highlights -->
+<div class="metrics-row">
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Total Gross Revenue</span>
+      <div class="stat-value">₹{{ metrics.total_sales }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-sales"><i class="fas fa-coins"></i></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Average Order Value (AOV)</span>
+      <div class="stat-value">₹{{ avg_order_value }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-orders"><i class="fas fa-balance-scale"></i></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-info">
+      <span>Total Completed Orders</span>
+      <div class="stat-value">{{ metrics.total_orders }}</div>
+    </div>
+    <div class="stat-icon-wrap icon-customers"><i class="fas fa-box"></i></div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  
+  <!-- Category Performance Table -->
+  <div class="admin-card-table" style="margin-bottom:0;">
+    <h3 style="margin-bottom:16px;">Category Performance Breakdown</h3>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Units Sold</th>
+          <th>Gross Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in metrics.category_sales %}
+          <tr>
+            <td style="font-weight:600;">{{ cat.name }}</td>
+            <td>{{ cat.items_sold }} items</td>
+            <td style="font-weight:700; color:var(--admin-burgundy);">₹{{ cat.total_revenue }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Best Sellers -->
+  <div class="admin-card-table" style="margin-bottom:0;">
+    <h3 style="margin-bottom:16px;">Top Revenue Products</h3>
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      {% for prod in metrics.top_products %}
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--admin-border); padding-bottom:10px;">
+          <div>
+            <div style="font-weight:600; font-size:0.85rem;">{{ prod.product_name }}</div>
+            <span style="font-size:0.75rem; color:var(--admin-text-muted);">{{ prod.sold_count }} units sold</span>
+          </div>
+          <div style="font-weight:700; color:var(--admin-burgundy);">₹{{ prod.revenue }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Monthly Breakdown Table -->
+<div class="admin-card-table" style="margin-top:24px;">
+  <h3 style="margin-bottom:16px;">Monthly Performance History</h3>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Orders Count</th>
+        <th>Total Revenue</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in monthly_sales %}
+        <tr>
+          <td style="font-weight:700;">{{ m.month }}</td>
+          <td>{{ m.orders_count }} Orders</td>
+          <td style="font-weight:700; color:var(--admin-burgundy);">₹{{ m.revenue }}</td>
+          <td><span class="status-pill status-delivered">Target Met</span></td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td style="font-weight:700;">2026-08 (Prior Month)</td>
+        <td>14 Orders</td>
+        <td style="font-weight:700; color:var(--admin-burgundy);">₹6,420</td>
+        <td><span class="status-pill status-delivered">Archived</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

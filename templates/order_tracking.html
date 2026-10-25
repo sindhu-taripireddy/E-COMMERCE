@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Track Your Order — KK_COLLECTIONS{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div style="background:var(--cream); padding:30px 24px; text-align:center; border-bottom:1px solid var(--border-color);">
+  <span style="color:var(--gold-dark); font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; font-weight:700;">
+    Live Shipment Status
+  </span>
+  <h1 style="font-size:2rem; color:var(--burgundy-dark); margin:6px 0 0;">Order Tracking</h1>
+  <p style="color:var(--gray-muted); font-size:0.88rem; margin-top:4px;">
+    Follow every milestone of your handcrafted jewelry from our studio to your doorstep.
+  </p>
+</div>
+
+<div style="max-width:900px; margin:40px auto 70px; padding:0 24px;">
+
+  <!-- Search by Tracking Number Form -->
+  <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:24px; box-shadow:var(--shadow-sm); margin-bottom:32px;">
+    <form method="GET" action="{{ url_for('track_order_page') }}" style="display:flex; gap:12px; flex-wrap:wrap;">
+      <input type="text" name="tracking" class="form-control" style="flex:1; min-width:260px;" 
+             placeholder="Enter your Order Tracking ID (e.g. KK20260918001)" value="{{ query_tracking or '' }}" required>
+      <button type="submit" class="btn btn-primary" style="padding:10px 24px;">
+        <i class="fas fa-search"></i> Track Order
+      </button>
+      <button type="button" class="btn btn-secondary" onclick="window.openKKAssistant('Where is my order {{ query_tracking or 'KK20260918001' }}')">
+        <i class="fas fa-robot"></i> Ask KK AI
+      </button>
+    </form>
+    <div style="font-size:0.78rem; color:var(--gray-muted); margin-top:8px;">
+      Tip: Try demo tracking ID <strong>KK20260918001</strong> (Shipped) or <strong>KK20260915002</strong> (Delivered).
+    </div>
+  </div>
+
+  {% if order %}
+    
+    <!-- Tracking Result Box -->
+    <div class="timeline-container">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:16px; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <div>
+          <span style="font-size:0.8rem; color:var(--gray-muted); text-transform:uppercase;">Tracking ID</span>
+          <h2 style="font-size:1.6rem; color:var(--burgundy); margin:2px 0 0;">#{{ order.tracking_number }}</h2>
+        </div>
+
+        <div style="text-align:right;">
+          <span style="font-size:0.8rem; color:var(--gray-muted); text-transform:uppercase;">Status</span>
+          <div>
+            <span class="status-pill status-{{ order.order_status|lower|replace(' ', '-') }}" style="font-size:0.9rem; padding:6px 14px;">
+              {{ order.order_status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-Stage Timeline -->
+      {% set steps = ["Order Placed", "Confirmed", "Packed", "Shipped", "Out for Delivery", "Delivered"] %}
+      {% set current_idx = 0 %}
+      {% if order.order_status == 'Order Placed' %}{% set current_idx = 0 %}
+      {% elif order.order_status == 'Confirmed' %}{% set current_idx = 1 %}
+      {% elif order.order_status == 'Packed' %}{% set current_idx = 2 %}
+      {% elif order.order_status == 'Shipped' %}{% set current_idx = 3 %}
+      {% elif order.order_status == 'Out for Delivery' %}{% set current_idx = 4 %}
+      {% elif order.order_status == 'Delivered' %}{% set current_idx = 5 %}
+      {% endif %}
+
+      <div class="tracking-steps">
+        {% for step in steps %}
+          <div class="tracking-step {% if loop.index0 < current_idx %}completed{% elif loop.index0 == current_idx %}current{% endif %}">
+            <div class="step-circle">
+              {% if loop.index0 < current_idx %}
+                <i class="fas fa-check"></i>
+              {% elif loop.index0 == current_idx %}
+                <i class="fas fa-dot-circle"></i>
+              {% else %}
+                <span>{{ loop.index }}</span>
+              {% endif %}
+            </div>
+            <div class="step-title">{{ step }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Dispatch Details Grid -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; background:var(--cream); padding:20px; border-radius:8px; border:1px solid var(--border-color); font-size:0.88rem; margin-top:30px;">
+        <div>
+          <span style="font-weight:700; color:var(--burgundy);">Recipient Details:</span><br>
+          <strong>{{ order.customer_name }}</strong><br>
+          {{ order.address }}<br>
+          {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+          Phone: {{ order.phone }}
+        </div>
+
+        <div>
+          <span style="font-weight:700; color:var(--burgundy);">Shipping Information:</span><br>
+          Carrier: <strong>Bluedart / Delhivery Express</strong><br>
+          Payment: <strong>{{ order.payment_method }} ({{ order.payment_status }})</strong><br>
+          Total Amount: <strong>₹{{ order.total_amount }}</strong><br>
+          Placed On: <strong>{{ order.created_at }}</strong>
+        </div>
+      </div>
+
+      <!-- Items in this shipment -->
+      <div style="margin-top:24px;">
+        <h4 style="font-size:1rem; margin-bottom:12px;">Articles in this Shipment:</h4>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          {% for item in order['items'] %}
+            <div style="display:flex; align-items:center; gap:12px; font-size:0.88rem; background:var(--white); border:1px solid var(--border-color); padding:10px 14px; border-radius:6px;">
+              <img src="{{ url_for('static', filename='images/products/' + item.image) }}" alt="" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+              <div style="flex:1;">
+                <strong>{{ item.product_name }}</strong>
+                {% if item.color %}<span style="color:var(--gray-muted);">({{ item.color }})</span>{% endif %}
+              </div>
+              <div>Qty: {{ item.quantity }}</div>
+              <div style="font-weight:700; color:var(--burgundy);">₹{{ item.subtotal }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+  {% elif query_tracking %}
+    <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:40px; text-align:center;">
+      <i class="fas fa-search-location" style="font-size:2.8rem; color:var(--gold); margin-bottom:12px;"></i>
+      <h3 style="font-size:1.3rem; color:var(--burgundy);">Order #{{ query_tracking }} not found</h3>
+      <p style="color:var(--gray-muted); font-size:0.9rem;">
+        Please double check the ID from your confirmation email, or ask our KK AI Assistant to help locate your order.
+      </p>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
