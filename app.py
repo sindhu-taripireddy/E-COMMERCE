@@ -704,7 +704,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     try:
         from waitress import serve
-        print(f"Starting server on http://0.0.0.0:{port}")
+        print(f"Starting server on http://localhost:{port} (or http://127.0.0.1:{port})")
         serve(app, host="0.0.0.0", port=port)
     except ImportError:
         app.run(debug=False, use_reloader=False, host="0.0.0.0", port=port)
